@@ -4,11 +4,14 @@ const axios = require('axios');
 const cors = require('cors');
 
 const app = express();
-// Usa el puerto que el hosting asigna
 const PORT = process.env.PORT || 3000; 
 
-// Habilita el acceso desde el frontend (CORS)
-app.use(cors());
+// 🔥 CORRECCIÓN CLAVE: Habilita CORS para cualquier origen, incluyendo localhost:8080.
+app.use(cors({
+    origin: '*', 
+    methods: 'GET',
+    credentials: true,
+}));
 
 /**
  * Middleware para validar que solo se hagan peticiones a cuevana.biz
@@ -31,14 +34,12 @@ app.get('/fetch-html', validarUrl, async (req, res) => {
 
     try {
         const response = await axios.get(targetUrl, {
-            // Se recomienda enviar un User-Agent para simular un navegador real
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
                 'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8'
             }
         });
 
-        // Devuelve el HTML obtenido al frontend
         res.send(response.data);
 
     } catch (error) {
